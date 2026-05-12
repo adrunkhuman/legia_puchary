@@ -4,7 +4,7 @@ import { computeStandings, canLegiaMakeIt, h2hStats } from './engine.js';
 const state = {};
 
 const TEAM_CODES = {
-  GOR: 'GOR', GKS: 'GKS', JAG: 'JAG', LEG: 'LEG', RAD: 'RAD', RAK: 'RAK', WIS: 'WIS', ZAG: 'ZAG',
+  GOR: 'GOR', GKS: 'GKS', JAG: 'JAG', LEC: 'LPO', LEG: 'LEG', RAD: 'RAD', RAK: 'RCZ', WIS: 'WIS', ZAG: 'ZAG',
 };
 
 const LOGO_BASE = 'https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Poland%20-%20PKO%20BP%20Ekstraklasa';
@@ -28,10 +28,6 @@ const TEAM_LOGOS = {
 
 const FIXTURE_TEAM_NAMES = {
   JAG: 'Jaga',
-};
-
-const STANDINGS_LOGOS = {
-  LCH: TEAM_LOGOS.LEC,
 };
 
 function renderStaticVerdict() {
@@ -65,8 +61,7 @@ function applyGoal(fixId, side, val) {
   state[fixId] = s;
 }
 
-// "Key" = involves a tracked team vs another tracked/top-team opponent
-// (Lech appears as 'LEC' in fixtures, not tracked but in top-9)
+// "Key" = involves a tracked team vs another tracked/top-team opponent.
 function isKeyFixture(fix) {
   if (fix.tracked.includes('LEG')) return true;
   if (fix.homeIsTracked && fix.awayIsTracked) return true;
@@ -249,7 +244,7 @@ function updateSim() {
 
   badge.style.display = '';
   const legia = standings.find(t => t.id === 'LEG');
-  const europeanLabels = getEuropeanLabels([LECH, ...standings]);
+  const europeanLabels = getEuropeanLabels(standings);
   const legiaInEurope = europeanLabels.has('LEG') ? true : legia.exAequo ? null : false;
 
   if (legiaInEurope === true) {
@@ -266,11 +261,6 @@ function updateSim() {
 
 // ── Standings table ───────────────────────────────────────────────────────────
 
-const LECH = {
-  id: 'LCH', name: 'Lech Poznań', pts: 56, gd: 15, gf: 57, ga: 42,
-  w: null, awayW: null, pos: 1, zone: 'europe', exAequo: false,
-};
-
 function renderStandings(sorted, usedWins, usedAwayWins) {
   const thead = document.querySelector('.standings thead tr');
   thead.innerHTML =
@@ -281,9 +271,9 @@ function renderStandings(sorted, usedWins, usedAwayWins) {
   const tbody = document.getElementById('standings-tbody');
   tbody.innerHTML = '';
 
-  const europeanLabels = getEuropeanLabels([LECH, ...sorted]);
+  const europeanLabels = getEuropeanLabels(sorted);
 
-  for (const t of [LECH, ...sorted]) {
+  for (const t of sorted) {
     const tr = document.createElement('tr');
     const euroLabel = europeanLabels.get(t.id);
     tr.className = [t.id === 'LEG' ? 'legia' : '', euroLabel ? 'europe' : 'no-europe'].filter(Boolean).join(' ');
@@ -310,7 +300,7 @@ function renderStandings(sorted, usedWins, usedAwayWins) {
 }
 
 function teamCellHtml(team) {
-  const logoUrl = STANDINGS_LOGOS[team.id] ?? TEAM_LOGOS[team.id];
+  const logoUrl = TEAM_LOGOS[team.id];
   if (!logoUrl) return `<span class="standings-team"><span class="standings-team-name">${team.name}</span></span>`;
 
   return `<span class="standings-team"><img class="standings-team-logo" src="${logoUrl}" alt="${team.name} logo" loading="lazy"><span class="standings-team-name">${team.name}</span></span>`;
@@ -318,9 +308,6 @@ function teamCellHtml(team) {
 
 function getEuropeanLabels(teams) {
   const labels = new Map();
-
-  const lech = teams.find(team => team.id === 'LCH');
-  if (lech && !lech.exAequo) labels.set(lech.id, 'LM');
 
   if (teams.some(team => team.exAequo && team.pos <= 6)) return labels;
 
@@ -442,7 +429,7 @@ function buildH2HTeam(team, points, side, stateClass) {
   text.className = 'h2h-duel-team-text';
   text.innerHTML = `<span class="h2h-duel-name">${team.name}</span><span class="h2h-duel-pts">${points} pkt</span>`;
 
-  const logoUrl = STANDINGS_LOGOS[team.id] ?? TEAM_LOGOS[team.id];
+  const logoUrl = TEAM_LOGOS[team.id];
   if (!logoUrl) {
     teamDiv.appendChild(text);
     return teamDiv;

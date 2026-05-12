@@ -93,7 +93,7 @@ export function computeStandings(fixtureState) {
   const { sorted, usedWins, usedAwayWins } = sortTeams(Object.values(stats), h2h);
 
   sorted.forEach((t, i) => {
-    t.pos = i + 2;
+    t.pos = i + 1;
   });
 
   const seenPts = new Set();
@@ -128,7 +128,7 @@ function getEuropeanLabels(sorted) {
   if (sorted.some(team => team.exAequo && team.pos <= 6)) return labels;
 
   for (const team of sorted) {
-    if (team.pos === 2) labels.set(team.id, 'LM');
+    if (team.pos <= 2) labels.set(team.id, 'LM');
   }
 
   const gornik = sorted.find(team => team.id === 'GOR');
