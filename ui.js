@@ -176,7 +176,7 @@ function refreshPicker(fix) {
 // ── Sim update ────────────────────────────────────────────────────────────────
 
 function updateSim() {
-  const { standings, tiedGroups, legiaInEurope, usedWins, usedAwayWins } = computeStandings(state);
+  const { standings, tiedGroups, usedWins, usedAwayWins } = computeStandings(state);
   renderStandings(standings, usedWins, usedAwayWins);
   renderH2HBlocks(tiedGroups);
 
@@ -196,6 +196,9 @@ function updateSim() {
 
   badge.style.display = '';
   const legia = standings.find(t => t.id === 'LEG');
+  const europeanLabels = getEuropeanLabels([LECH, ...standings]);
+  const legiaInEurope = europeanLabels.has('LEG') ? true : legia.exAequo ? null : false;
+
   if (legiaInEurope === true) {
     badge.textContent = `Legia w pucharach (${legia.pos}.)`;
     badge.className = 'sim-verdict sim-yes';

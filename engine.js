@@ -91,18 +91,8 @@ export function computeStandings(fixtureState) {
 
   const { sorted, usedWins, usedAwayWins } = sortTeams(Object.values(stats), h2h);
 
-  const gornikPos = sorted.findIndex(t => t.id === 'GOR') + 2;
-  const gornikInTop5 = gornikPos <= 5;
-  // Used for Legia verdict (cascade-aware); visual coloring always uses 5
-  const euroSlots = gornikInTop5 ? 6 : 5;
-
   sorted.forEach((t, i) => {
     t.pos = i + 2;
-    // 5 total European spots: Lech (1) + 4 tracked teams (positions 2-5)
-    // Górnik cup winner always qualifies even if outside league top-5
-    const inLeagueEuro = t.pos <= 5;
-    const hasCupBerth  = t.id === 'GOR' && !gornikInTop5;
-    t.zone = (inLeagueEuro || hasCupBerth) ? 'europe' : 'no-europe';
   });
 
   const seenPts = new Set();
@@ -124,12 +114,39 @@ export function computeStandings(fixtureState) {
   }
 
   const legiaEntry = sorted.find(t => t.id === 'LEG');
-  const legiaInEurope =
-    legiaEntry.exAequo && legiaEntry.pos <= euroSlots ? null
-    : legiaEntry.pos <= euroSlots ? true
-    : false;
+  const europeanLabels = getEuropeanLabels(sorted);
+  const legiaInEurope = europeanLabels.has('LEG') ? true : legiaEntry.exAequo ? null : false;
 
-  return { standings: sorted, tiedGroups, legiaInEurope, gornikInTop5, usedWins, usedAwayWins };
+  sorted.forEach(t => { t.zone = europeanLabels.has(t.id) ? 'europe' : 'no-europe'; });
+
+  return { standings: sorted, tiedGroups, legiaInEurope, usedWins, usedAwayWins };
+}
+
+function getEuropeanLabels(sorted) {
+  const labels = new Map();
+  if (sorted.some(team => team.exAequo && team.pos <= 6)) return labels;
+
+  for (const team of sorted) {
+    if (team.pos === 2) labels.set(team.id, 'LM');
+  }
+
+  const gornik = sorted.find(team => team.id === 'GOR');
+  if (gornik && !labels.has(gornik.id)) {
+    labels.set(gornik.id, 'LE');
+  } else {
+    const leTeam = sorted.find(team => !labels.has(team.id));
+    if (leTeam) labels.set(leTeam.id, 'LE');
+  }
+
+  let lkeCount = 0;
+  for (const team of sorted) {
+    if (labels.has(team.id) || team.id === 'RAD') continue;
+    labels.set(team.id, 'LKE');
+    lkeCount++;
+    if (lkeCount === 2) break;
+  }
+
+  return labels;
 }
 
 export function canLegiaMakeIt() {
