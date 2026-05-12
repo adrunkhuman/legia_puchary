@@ -1,34 +1,43 @@
 import { FIXTURES } from './data.js';
-import { computeStandings, canLegiaMakeIt, h2hStats } from './engine.js';
+import { computeStandings, canLegiaMakeIt } from './engine.js';
 
 const state = {};
 
-const TEAM_CODES = {
-  GOR: 'GOR', GKS: 'GKS', JAG: 'JAG', LEC: 'LPO', LEG: 'LEG', RAD: 'RAD', RAK: 'RCZ', WIS: 'WIS', ZAG: 'ZAG',
-};
-
 const LOGO_BASE = 'https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Poland%20-%20PKO%20BP%20Ekstraklasa';
 
-const TEAM_LOGOS = {
-  ARK: `${LOGO_BASE}/Arka%20Gdynia.png`,
-  GKS: `${LOGO_BASE}/GKS%20Katowice.png`,
-  GOR: `${LOGO_BASE}/G%C3%B3rnik%20Zabrze.png`,
-  JAG: `${LOGO_BASE}/Jagiellonia%20Bialystok.png`,
-  LEC: `${LOGO_BASE}/Lech%20Poznan.png`,
-  LEG: `${LOGO_BASE}/Legia%20Warszawa.png`,
-  LCH: `${LOGO_BASE}/Lechia%20Gdansk.png`,
-  MOT: `${LOGO_BASE}/Motor%20Lublin.png`,
-  PIR: `${LOGO_BASE}/Piast%20Gliwice.png`,
-  POG: `${LOGO_BASE}/Pogon%20Szczecin.png`,
-  RAD: `${LOGO_BASE}/Radomiak%20Radom.png`,
-  RAK: `${LOGO_BASE}/Rak%C3%B3w%20Cz%C4%99stochowa.png`,
-  WIS: `${LOGO_BASE}/Wisla%20Plock.png`,
-  ZAG: `${LOGO_BASE}/Zaglebie%20Lubin.png`,
+const TEAM_META = {
+  ARK: { code: 'ARK', logo: 'Arka%20Gdynia.png' },
+  BBT: { code: 'BBT', logo: 'Bruk-Bet%20Termalica%20Nieciecza.png' },
+  CRA: { code: 'CRA', logo: 'Cracovia.png' },
+  GKS: { code: 'GKS', logo: 'GKS%20Katowice.png' },
+  GOR: { code: 'GÓR', logo: 'G%C3%B3rnik%20Zabrze.png' },
+  JAG: { code: 'JAG', logo: 'Jagiellonia%20Bialystok.png', fixtureName: 'Jaga' },
+  KOR: { code: 'KOR', logo: 'Korona%20Kielce.png' },
+  LEC: { code: 'LPO', logo: 'Lech%20Poznan.png' },
+  LCH: { code: 'LGD', logo: 'Lechia%20Gdansk.png' },
+  LEG: { code: 'LEG', logo: 'Legia%20Warszawa.png' },
+  MOT: { code: 'MOT', logo: 'Motor%20Lublin.png' },
+  PIR: { code: 'PIA', logo: 'Piast%20Gliwice.png' },
+  POG: { code: 'POG', logo: 'Pogon%20Szczecin.png' },
+  RAD: { code: 'RAD', logo: 'Radomiak%20Radom.png' },
+  RAK: { code: 'RCZ', logo: 'Rak%C3%B3w%20Cz%C4%99stochowa.png' },
+  WID: { code: 'WID', logo: 'Widzew%20Lodz.png' },
+  WIS: { code: 'WPŁ', logo: 'Wisla%20Plock.png' },
+  ZAG: { code: 'ZAG', logo: 'Zaglebie%20Lubin.png' },
 };
 
-const FIXTURE_TEAM_NAMES = {
-  JAG: 'Jaga',
-};
+function teamCode(teamId) {
+  return TEAM_META[teamId]?.code ?? teamId;
+}
+
+function teamLogo(teamId) {
+  const fileName = TEAM_META[teamId]?.logo;
+  return fileName ? `${LOGO_BASE}/${fileName}` : null;
+}
+
+function fixtureTeamName(teamId, fallback) {
+  return TEAM_META[teamId]?.fixtureName ?? fallback;
+}
 
 function renderStaticVerdict() {
   const possible = canLegiaMakeIt();
@@ -51,8 +60,6 @@ export function init() {
   updateSim();
 }
 
-// ── Fixtures ──────────────────────────────────────────────────────────────────
-
 function applyGoal(fixId, side, val) {
   const s = state[fixId] ?? { hg: null, ag: null };
   s[side] = val;
@@ -61,11 +68,9 @@ function applyGoal(fixId, side, val) {
   state[fixId] = s;
 }
 
-// "Key" = involves a tracked team vs another tracked/top-team opponent.
 function isKeyFixture(fix) {
   if (fix.tracked.includes('LEG')) return true;
   if (fix.homeIsTracked && fix.awayIsTracked) return true;
-  if (fix.home === 'LEC' || fix.away === 'LEC') return true;
   return false;
 }
 
@@ -128,8 +133,8 @@ function buildPicker(fix) {
   const awayColumn = document.createElement('div');
   awayColumn.className = 'score-column score-column-away';
 
-  const homeName = buildTeamName(FIXTURE_TEAM_NAMES[fix.home] ?? homeLabel, fix.home, 'home');
-  const awayName = buildTeamName(FIXTURE_TEAM_NAMES[fix.away] ?? awayLabel, fix.away, 'away');
+  const homeName = buildTeamName(fixtureTeamName(fix.home, homeLabel), fix.home, 'home');
+  const awayName = buildTeamName(fixtureTeamName(fix.away, awayLabel), fix.away, 'away');
 
   const homeSide = document.createElement('div');
   homeSide.className = 'score-side';
@@ -137,7 +142,6 @@ function buildPicker(fix) {
   const awaySide = document.createElement('div');
   awaySide.className = 'score-side';
 
-  // Home counts down (3→0) so 0 sits closest to the dash — mirror of away
   for (const g of [3, 2, 1, 0]) {
     const btn = document.createElement('button');
     btn.className = 'sbtn';
@@ -191,7 +195,7 @@ function buildTeamName(label, teamId, side) {
   text.className = 'score-team-name';
   text.textContent = label;
 
-  const logoUrl = TEAM_LOGOS[teamId];
+  const logoUrl = teamLogo(teamId);
   if (!logoUrl) {
     name.appendChild(text);
     return name;
@@ -221,15 +225,11 @@ function refreshPicker(fix) {
   }
 }
 
-// ── Sim update ────────────────────────────────────────────────────────────────
-
 function updateSim() {
   const { standings, tiedGroups, usedWins, usedAwayWins } = computeStandings(state);
   renderStandings(standings, usedWins, usedAwayWins);
   renderH2HBlocks(tiedGroups);
 
-  // Verdict shows once all key fixtures (involving tracked/top-9 teams) are filled;
-  // non-key games (tracked team vs lower-table filler) don't block the summary.
   const keyPending = FIXTURES.filter(f => isKeyFixture(f)).filter(f => {
     const s = state[f.id];
     return !s || s.hg == null || s.ag == null;
@@ -258,8 +258,6 @@ function updateSim() {
     badge.className = 'sim-verdict sim-no';
   }
 }
-
-// ── Standings table ───────────────────────────────────────────────────────────
 
 function renderStandings(sorted, usedWins, usedAwayWins) {
   const thead = document.querySelector('.standings thead tr');
@@ -300,7 +298,7 @@ function renderStandings(sorted, usedWins, usedAwayWins) {
 }
 
 function teamCellHtml(team) {
-  const logoUrl = TEAM_LOGOS[team.id];
+  const logoUrl = teamLogo(team.id);
   if (!logoUrl) return `<span class="standings-team"><span class="standings-team-name">${team.name}</span></span>`;
 
   return `<span class="standings-team"><img class="standings-team-logo" src="${logoUrl}" alt="${team.name} logo" loading="lazy"><span class="standings-team-name">${team.name}</span></span>`;
@@ -334,8 +332,6 @@ function getEuropeanLabels(teams) {
   return labels;
 }
 
-// ── H2H blocks ────────────────────────────────────────────────────────────────
-
 function renderH2HBlocks(tiedGroups) {
   const container = document.getElementById('h2h-blocks');
   container.innerHTML = '';
@@ -363,19 +359,16 @@ function renderH2HBlocks(tiedGroups) {
 function render2TeamH2H(block, teams, grid, hh, complete) {
   const [a, b] = teams;
 
-  // Determine H2H leader for coloring
   const aPts = hh[a.id].pts, bPts = hh[b.id].pts;
   const aGd  = hh[a.id].gd,  bGd  = hh[b.id].gd;
   const aLeads = complete && (aPts > bPts || (aPts === bPts && aGd > bGd));
   const bLeads = complete && (bPts > aPts || (bPts === aPts && bGd > aGd));
 
-  // Aggregate (partial is still useful when 1 leg done)
   const leg1 = grid[a.id][b.id];
   const leg2 = grid[b.id][a.id];
   const aggA = hh[a.id].gf, aggB = hh[b.id].gf;
   const hasAgg = leg1 || leg2;
 
-  // ── Duel scoreboard ──
   const duel = document.createElement('div');
   duel.className = 'h2h-duel';
 
@@ -396,18 +389,17 @@ function render2TeamH2H(block, teams, grid, hh, complete) {
   duel.appendChild(bDiv);
   block.appendChild(duel);
 
-  // ── Individual legs ──
   const legs = document.createElement('p');
   legs.className = 'h2h-legs';
   const parts = [];
   for (const [home, away] of [[a, b], [b, a]]) {
     const r = grid[home.id][away.id];
     if (!r) {
-      parts.push(`<span class="h2h-leg-result h2h-pending">${TEAM_CODES[home.id]} vs ${TEAM_CODES[away.id]}</span>`);
+      parts.push(`<span class="h2h-leg-result h2h-pending">${teamCode(home.id)} vs ${teamCode(away.id)}</span>`);
     } else {
       const [hg, ag] = r;
       const cls = hg > ag ? 'h2h-w' : hg < ag ? 'h2h-l' : 'h2h-d';
-      parts.push(`<span class="h2h-leg-result"><span>${TEAM_CODES[home.id]}</span> <span class="${cls}">${hg}–${ag}</span> <span>${TEAM_CODES[away.id]}</span></span>`);
+      parts.push(`<span class="h2h-leg-result"><span>${teamCode(home.id)}</span> <span class="${cls}">${hg}–${ag}</span> <span>${teamCode(away.id)}</span></span>`);
     }
   }
   legs.innerHTML = parts.join('');
@@ -429,7 +421,7 @@ function buildH2HTeam(team, points, side, stateClass) {
   text.className = 'h2h-duel-team-text';
   text.innerHTML = `<span class="h2h-duel-name">${team.name}</span><span class="h2h-duel-pts">${points} pkt</span>`;
 
-  const logoUrl = TEAM_LOGOS[team.id];
+  const logoUrl = teamLogo(team.id);
   if (!logoUrl) {
     teamDiv.appendChild(text);
     return teamDiv;

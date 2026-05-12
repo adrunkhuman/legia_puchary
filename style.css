@@ -26,7 +26,6 @@ html, body {
   padding: clamp(1.5rem, 5vw, 3rem) clamp(1rem, 4vw, 1.5rem);
 }
 
-/* ── Header ── */
 .hdr {
   display: flex;
   justify-content: space-between;
@@ -46,7 +45,6 @@ html, body {
   white-space: nowrap;
 }
 
-/* ── Verdict ── */
 .verdict {
   display: flex;
   flex-direction: column;
@@ -75,7 +73,6 @@ html, body {
   letter-spacing: 0.08em;
 }
 
-/* ── Section label ── */
 .section-lbl {
   font-size: 0.65rem;
   font-weight: 700;
@@ -85,7 +82,6 @@ html, body {
   margin: 0 0 0.75rem;
 }
 
-/* ── Standings table ── */
 .standings {
   width: 100%;
   max-width: 42rem;
@@ -166,7 +162,6 @@ html, body {
 .euro-le { color: var(--green); }
 .euro-lke { color: var(--amber); }
 
-/* ── Fixtures ── */
 .fixture-group { margin-bottom: 1.5rem; }
 
 .fixture-group-lbl {
@@ -251,7 +246,6 @@ html, body {
   line-height: 1.3;
 }
 
-/* ── Score picker ── */
 .score-picker {
   display: flex;
   align-items: flex-end;
@@ -339,7 +333,6 @@ html, body {
 
 .score-clear:hover { color: var(--red); }
 
-/* ── Conditions ── */
 .conditions {
   max-width: 42rem;
   margin-bottom: 1.75rem;
@@ -363,7 +356,6 @@ html, body {
 
 .conditions-list li { min-width: 0; }
 
-/* ── Sim verdict badge ── */
 .sim-verdict {
   font-size: 0.72rem;
   letter-spacing: 0.06em;
@@ -378,7 +370,6 @@ html, body {
 .sim-no       { color: var(--red);   border-color: var(--red); }
 .sim-open     { color: var(--amber); border-color: var(--amber); }
 
-/* ── H2H blocks ── */
 .h2h-blocks {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -406,7 +397,6 @@ html, body {
   margin: 0 0 0.6rem;
 }
 
-/* 2-team duel scoreboard */
 .h2h-duel {
   display: flex;
   justify-content: center;
@@ -476,7 +466,6 @@ html, body {
   color: var(--dim);
 }
 
-/* Individual legs */
 .h2h-legs {
   display: flex;
   justify-content: center;
@@ -498,7 +487,6 @@ html, body {
 .h2h-d       { color: var(--amber); }
 .h2h-l       { color: var(--red); }
 
-/* N-team summary table */
 .h2h-summary-table {
   border-collapse: collapse;
   font-size: 0.7rem;

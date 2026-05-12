@@ -65,7 +65,6 @@ function sortTeams(teams, h2hMap) {
   return { sorted, usedWins, usedAwayWins };
 }
 
-// fixtureState: { [id]: { hg: number, ag: number } | undefined }
 export function computeStandings(fixtureState) {
   const stats = {};
   for (const [id, t] of Object.entries(TEAMS)) {
