@@ -55,6 +55,7 @@ function sortTeams(teams, h2hMap) {
     const hh = h2hStats(group, h2hMap);
     if (hh[b.id].pts !== hh[a.id].pts) return hh[b.id].pts - hh[a.id].pts;
     if (hh[b.id].gd  !== hh[a.id].gd)  return hh[b.id].gd  - hh[a.id].gd;
+    if (group.length > 2 && hh[b.id].gf !== hh[a.id].gf) return hh[b.id].gf - hh[a.id].gf;
     if (b.gd !== a.gd) return b.gd - a.gd;
     if (b.gf !== a.gf) return b.gf - a.gf;
     if (b.w  !== a.w)  { usedWins = true; return b.w  - a.w; }

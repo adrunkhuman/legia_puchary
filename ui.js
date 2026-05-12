@@ -381,19 +381,20 @@ function render2TeamH2H(block, teams, grid, hh, complete) {
 function renderNTeamH2H(block, teams, hh, complete) {
   const sorted = [...teams].sort((a, b) => {
     if (hh[b.id].pts !== hh[a.id].pts) return hh[b.id].pts - hh[a.id].pts;
-    return hh[b.id].gd - hh[a.id].gd;
+    if (hh[b.id].gd !== hh[a.id].gd) return hh[b.id].gd - hh[a.id].gd;
+    return hh[b.id].gf - hh[a.id].gf;
   });
 
   const table = document.createElement('table');
   table.className = 'h2h-summary-table';
-  table.innerHTML = '<thead><tr><th>Zespół</th><th>pkt</th><th>bilans</th></tr></thead>';
+  table.innerHTML = '<thead><tr><th>Zespół</th><th>pkt</th><th>bilans</th><th>BZ</th></tr></thead>';
 
   const tbody = document.createElement('tbody');
   for (const [i, t] of sorted.entries()) {
     const gd = hh[t.id].gd;
     const tr = document.createElement('tr');
     if (complete && i === 0) tr.className = 'h2h-row-leader';
-    tr.innerHTML = `<td class="h2h-team">${t.name}</td><td>${hh[t.id].pts}</td><td>${gd >= 0 ? '+' : ''}${gd}</td>`;
+    tr.innerHTML = `<td class="h2h-team">${t.name}</td><td>${hh[t.id].pts}</td><td>${gd >= 0 ? '+' : ''}${gd}</td><td>${hh[t.id].gf}</td>`;
     tbody.appendChild(tr);
   }
   table.appendChild(tbody);
