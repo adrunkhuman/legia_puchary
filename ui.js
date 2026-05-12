@@ -229,10 +229,10 @@ function renderStandings(sorted, usedWins, usedAwayWins) {
 
   for (const t of [LECH, ...sorted]) {
     const tr = document.createElement('tr');
-    tr.className = [t.id === 'LEG' ? 'legia' : '', t.zone ?? 'europe'].filter(Boolean).join(' ');
+    const euroLabel = europeanLabels.get(t.id);
+    tr.className = [t.id === 'LEG' ? 'legia' : '', euroLabel ? 'europe' : 'no-europe'].filter(Boolean).join(' ');
 
     const posStr = t.exAequo ? `${t.pos}~` : `${t.pos}`;
-    const euroLabel = europeanLabels.get(t.id);
     const gdStr  = (t.gd >= 0 ? '+' : '') + t.gd;
     const gf = t.gf ?? '—';
     const ga = t.ga ?? '—';
@@ -266,7 +266,12 @@ function getEuropeanLabels(teams) {
   }
 
   const gornik = teams.find(team => team.id === 'GOR');
-  if (gornik && !gornik.exAequo && !labels.has(gornik.id)) labels.set(gornik.id, 'LE');
+  if (gornik && !gornik.exAequo && !labels.has(gornik.id)) {
+    labels.set(gornik.id, 'LE');
+  } else {
+    const leTeam = teams.find(team => !team.exAequo && !labels.has(team.id));
+    if (leTeam) labels.set(leTeam.id, 'LE');
+  }
 
   let lkeCount = 0;
   for (const team of teams) {
