@@ -352,8 +352,41 @@ function renderH2HBlocks(tiedGroups) {
       renderNTeamH2H(block, teams, hh, complete);
     }
 
+    renderTieBreakerNote(block, teams, hh, complete);
+
     container.appendChild(block);
   }
+}
+
+function tieBreakerNote(teams, hh, complete) {
+  if (!complete || teams.length < 2) return null;
+
+  const [leader, runnerUp] = teams;
+  if (hh[leader.id].pts !== hh[runnerUp.id].pts) return null;
+  if (hh[leader.id].gd !== hh[runnerUp.id].gd) return null;
+  if (teams.length > 2 && hh[leader.id].gf !== hh[runnerUp.id].gf) return null;
+  if (leader.gd !== runnerUp.gd) return null;
+  if (leader.gf !== runnerUp.gf) return null;
+
+  if (leader.w !== runnerUp.w) {
+    return `liczba zwycięstw: ${leader.name} ${leader.w}, ${runnerUp.name} ${runnerUp.w}`;
+  }
+
+  if (leader.awayW !== runnerUp.awayW) {
+    return `zwycięstwa wyjazdowe: ${leader.name} ${leader.awayW}, ${runnerUp.name} ${runnerUp.awayW}`;
+  }
+
+  return null;
+}
+
+function renderTieBreakerNote(block, teams, hh, complete) {
+  const text = tieBreakerNote(teams, hh, complete);
+  if (!text) return;
+
+  const note = document.createElement('p');
+  note.className = 'h2h-note';
+  note.textContent = text;
+  block.appendChild(note);
 }
 
 function render2TeamH2H(block, teams, grid, hh, complete) {
