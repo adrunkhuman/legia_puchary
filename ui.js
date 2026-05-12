@@ -7,6 +7,33 @@ const TEAM_CODES = {
   GOR: 'GOR', GKS: 'GKS', JAG: 'JAG', LEG: 'LEG', RAD: 'RAD', RAK: 'RAK', WIS: 'WIS', ZAG: 'ZAG',
 };
 
+const LOGO_BASE = 'https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Poland%20-%20PKO%20BP%20Ekstraklasa';
+
+const TEAM_LOGOS = {
+  ARK: `${LOGO_BASE}/Arka%20Gdynia.png`,
+  GKS: `${LOGO_BASE}/GKS%20Katowice.png`,
+  GOR: `${LOGO_BASE}/G%C3%B3rnik%20Zabrze.png`,
+  JAG: `${LOGO_BASE}/Jagiellonia%20Bialystok.png`,
+  LEC: `${LOGO_BASE}/Lech%20Poznan.png`,
+  LEG: `${LOGO_BASE}/Legia%20Warszawa.png`,
+  LCH: `${LOGO_BASE}/Lechia%20Gdansk.png`,
+  MOT: `${LOGO_BASE}/Motor%20Lublin.png`,
+  PIR: `${LOGO_BASE}/Piast%20Gliwice.png`,
+  POG: `${LOGO_BASE}/Pogon%20Szczecin.png`,
+  RAD: `${LOGO_BASE}/Radomiak%20Radom.png`,
+  RAK: `${LOGO_BASE}/Rak%C3%B3w%20Cz%C4%99stochowa.png`,
+  WIS: `${LOGO_BASE}/Wisla%20Plock.png`,
+  ZAG: `${LOGO_BASE}/Zaglebie%20Lubin.png`,
+};
+
+const FIXTURE_TEAM_NAMES = {
+  JAG: 'Jaga',
+};
+
+const STANDINGS_LOGOS = {
+  LCH: TEAM_LOGOS.LEC,
+};
+
 function renderStaticVerdict() {
   const possible = canLegiaMakeIt();
   const word = document.getElementById('verdict-word');
@@ -106,13 +133,8 @@ function buildPicker(fix) {
   const awayColumn = document.createElement('div');
   awayColumn.className = 'score-column score-column-away';
 
-  const homeName = document.createElement('div');
-  homeName.className = 'score-team';
-  homeName.textContent = homeLabel;
-
-  const awayName = document.createElement('div');
-  awayName.className = 'score-team';
-  awayName.textContent = awayLabel;
+  const homeName = buildTeamName(FIXTURE_TEAM_NAMES[fix.home] ?? homeLabel, fix.home, 'home');
+  const awayName = buildTeamName(FIXTURE_TEAM_NAMES[fix.away] ?? awayLabel, fix.away, 'away');
 
   const homeSide = document.createElement('div');
   homeSide.className = 'score-side';
@@ -164,6 +186,37 @@ function buildPicker(fix) {
 
   fix._picker = wrap;
   return wrap;
+}
+
+function buildTeamName(label, teamId, side) {
+  const name = document.createElement('div');
+  name.className = `score-team score-team-${side}`;
+
+  const text = document.createElement('span');
+  text.className = 'score-team-name';
+  text.textContent = label;
+
+  const logoUrl = TEAM_LOGOS[teamId];
+  if (!logoUrl) {
+    name.appendChild(text);
+    return name;
+  }
+
+  const logo = document.createElement('img');
+  logo.className = 'score-team-logo';
+  logo.src = logoUrl;
+  logo.alt = `${label} logo`;
+  logo.loading = 'lazy';
+
+  if (side === 'home') {
+    name.appendChild(text);
+    name.appendChild(logo);
+  } else {
+    name.appendChild(logo);
+    name.appendChild(text);
+  }
+
+  return name;
 }
 
 function refreshPicker(fix) {
@@ -245,7 +298,7 @@ function renderStandings(sorted, usedWins, usedAwayWins) {
 
     tr.innerHTML = `
       <td><span class="rank-pos">${posStr}</span>${euroLabel ? `<span class="euro-label euro-${euroLabel.toLowerCase()}">${euroLabel}</span>` : ''}</td>
-      <td>${t.name}</td>
+      <td>${teamCellHtml(t)}</td>
       <td>${t.pts}</td>
       <td>${gdStr}</td>
       <td>${gf}</td>
@@ -254,6 +307,13 @@ function renderStandings(sorted, usedWins, usedAwayWins) {
     `;
     tbody.appendChild(tr);
   }
+}
+
+function teamCellHtml(team) {
+  const logoUrl = STANDINGS_LOGOS[team.id] ?? TEAM_LOGOS[team.id];
+  if (!logoUrl) return `<span class="standings-team"><span class="standings-team-name">${team.name}</span></span>`;
+
+  return `<span class="standings-team"><img class="standings-team-logo" src="${logoUrl}" alt="${team.name} logo" loading="lazy"><span class="standings-team-name">${team.name}</span></span>`;
 }
 
 function getEuropeanLabels(teams) {
@@ -332,9 +392,7 @@ function render2TeamH2H(block, teams, grid, hh, complete) {
   const duel = document.createElement('div');
   duel.className = 'h2h-duel';
 
-  const aDiv = document.createElement('div');
-  aDiv.className = 'h2h-duel-team' + (aLeads ? ' h2h-leader' : bLeads ? ' h2h-trailer' : '');
-  aDiv.innerHTML = `<span class="h2h-duel-name">${a.name}</span><span class="h2h-duel-pts">${aPts} pkt</span>`;
+  const aDiv = buildH2HTeam(a, aPts, 'home', aLeads ? 'h2h-leader' : bLeads ? 'h2h-trailer' : '');
 
   const center = document.createElement('div');
   center.className = 'h2h-duel-center';
@@ -344,9 +402,7 @@ function render2TeamH2H(block, teams, grid, hh, complete) {
     center.innerHTML = `<span class="h2h-duel-agg-label">brak meczów</span>`;
   }
 
-  const bDiv = document.createElement('div');
-  bDiv.className = 'h2h-duel-team h2h-duel-team-r' + (bLeads ? ' h2h-leader' : aLeads ? ' h2h-trailer' : '');
-  bDiv.innerHTML = `<span class="h2h-duel-name">${b.name}</span><span class="h2h-duel-pts">${bPts} pkt</span>`;
+  const bDiv = buildH2HTeam(b, bPts, 'away', bLeads ? 'h2h-leader' : aLeads ? 'h2h-trailer' : '');
 
   duel.appendChild(aDiv);
   duel.appendChild(center);
@@ -376,6 +432,37 @@ function render2TeamH2H(block, teams, grid, hh, complete) {
     note.textContent = 'nie wszystkie mecze zostały rozegrane';
     block.appendChild(note);
   }
+}
+
+function buildH2HTeam(team, points, side, stateClass) {
+  const teamDiv = document.createElement('div');
+  teamDiv.className = ['h2h-duel-team', side === 'away' ? 'h2h-duel-team-r' : '', stateClass].filter(Boolean).join(' ');
+
+  const text = document.createElement('div');
+  text.className = 'h2h-duel-team-text';
+  text.innerHTML = `<span class="h2h-duel-name">${team.name}</span><span class="h2h-duel-pts">${points} pkt</span>`;
+
+  const logoUrl = STANDINGS_LOGOS[team.id] ?? TEAM_LOGOS[team.id];
+  if (!logoUrl) {
+    teamDiv.appendChild(text);
+    return teamDiv;
+  }
+
+  const logo = document.createElement('img');
+  logo.className = 'h2h-duel-logo';
+  logo.src = logoUrl;
+  logo.alt = `${team.name} logo`;
+  logo.loading = 'lazy';
+
+  if (side === 'away') {
+    teamDiv.appendChild(logo);
+    teamDiv.appendChild(text);
+  } else {
+    teamDiv.appendChild(text);
+    teamDiv.appendChild(logo);
+  }
+
+  return teamDiv;
 }
 
 function renderNTeamH2H(block, teams, hh, complete) {
