@@ -218,9 +218,7 @@ html, body {
 .site-image {
   display: block;
   width: min(100%, 42rem);
-  max-height: 20rem;
-  object-fit: cover;
-  object-position: center;
+  height: auto;
   margin: 2.25rem auto 0;
   border: 1px solid var(--border);
 }
