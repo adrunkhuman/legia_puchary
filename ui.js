@@ -372,11 +372,11 @@ function renderH2HBlocks(tiedGroups) {
 
 function tieBreakerNote(teams, hh, complete) {
   if (!complete || teams.length < 2) return null;
+  if (teams.some(team => team.exAequo)) return 'nierozstrzygnięte bez punktów za kartki';
 
   const [leader, runnerUp] = teams;
   if (hh[leader.id].pts !== hh[runnerUp.id].pts) return null;
   if (hh[leader.id].gd !== hh[runnerUp.id].gd) return null;
-  if (teams.length > 2 && hh[leader.id].gf !== hh[runnerUp.id].gf) return null;
   if (leader.gd !== runnerUp.gd) return null;
   if (leader.gf !== runnerUp.gf) return null;
 
@@ -388,7 +388,7 @@ function tieBreakerNote(teams, hh, complete) {
     return `zwycięstwa wyjazdowe: ${leader.name} ${leader.awayW}, ${runnerUp.name} ${runnerUp.awayW}`;
   }
 
-  return null;
+  return 'nierozstrzygnięte bez punktów za kartki';
 }
 
 function renderTieBreakerNote(block, teams, hh, complete) {
@@ -493,19 +493,21 @@ function renderNTeamH2H(block, teams, hh, complete) {
   const sorted = [...teams].sort((a, b) => {
     if (hh[b.id].pts !== hh[a.id].pts) return hh[b.id].pts - hh[a.id].pts;
     if (hh[b.id].gd !== hh[a.id].gd) return hh[b.id].gd - hh[a.id].gd;
-    return hh[b.id].gf - hh[a.id].gf;
+    return 0;
   });
 
   const table = document.createElement('table');
   table.className = 'h2h-summary-table';
-  table.innerHTML = '<thead><tr><th>Zespół</th><th>pkt</th><th>bilans</th><th>BZ</th></tr></thead>';
+  table.innerHTML = '<thead><tr><th>Zespół</th><th>pkt</th><th>bilans</th></tr></thead>';
 
   const tbody = document.createElement('tbody');
   for (const [i, t] of sorted.entries()) {
     const gd = hh[t.id].gd;
     const tr = document.createElement('tr');
-    if (complete && i === 0) tr.className = 'h2h-row-leader';
-    tr.innerHTML = `<td class="h2h-team">${t.name}</td><td>${hh[t.id].pts}</td><td>${gd >= 0 ? '+' : ''}${gd}</td><td>${hh[t.id].gf}</td>`;
+    const next = sorted[1];
+    const leadsH2H = i === 0 && (!next || hh[t.id].pts !== hh[next.id].pts || hh[t.id].gd !== hh[next.id].gd);
+    if (complete && leadsH2H) tr.className = 'h2h-row-leader';
+    tr.innerHTML = `<td class="h2h-team">${t.name}</td><td>${hh[t.id].pts}</td><td>${gd >= 0 ? '+' : ''}${gd}</td>`;
     tbody.appendChild(tr);
   }
   table.appendChild(tbody);

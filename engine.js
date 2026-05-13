@@ -55,7 +55,6 @@ function sortTeams(teams, h2hMap) {
     const hh = h2hStats(group, h2hMap);
     if (hh[b.id].pts !== hh[a.id].pts) return hh[b.id].pts - hh[a.id].pts;
     if (hh[b.id].gd  !== hh[a.id].gd)  return hh[b.id].gd  - hh[a.id].gd;
-    if (group.length > 2 && hh[b.id].gf !== hh[a.id].gf) return hh[b.id].gf - hh[a.id].gf;
     if (b.gd !== a.gd) return b.gd - a.gd;
     if (b.gf !== a.gf) return b.gf - a.gf;
     if (b.w  !== a.w)  { usedWins = true; return b.w  - a.w; }
@@ -63,6 +62,35 @@ function sortTeams(teams, h2hMap) {
     return 0;
   });
   return { sorted, usedWins, usedAwayWins };
+}
+
+function compareImplementedTieBreakers(a, b, group, h2hMap) {
+  const hh = h2hStats(group, h2hMap);
+  if (hh[b.id].pts !== hh[a.id].pts) return hh[b.id].pts - hh[a.id].pts;
+  if (hh[b.id].gd  !== hh[a.id].gd)  return hh[b.id].gd  - hh[a.id].gd;
+  if (b.gd !== a.gd) return b.gd - a.gd;
+  if (b.gf !== a.gf) return b.gf - a.gf;
+  if (b.w  !== a.w)  return b.w  - a.w;
+  if (b.awayW !== a.awayW) return b.awayW - a.awayW;
+  return 0;
+}
+
+function markUnresolvedCardTies(group, h2hMap) {
+  let start = 0;
+  while (start < group.length) {
+    let end = start + 1;
+    while (end < group.length && compareImplementedTieBreakers(group[start], group[end], group, h2hMap) === 0) end++;
+
+    if (end - start > 1) {
+      const minPos = group[start].pos;
+      for (let i = start; i < end; i++) {
+        group[i].pos = minPos;
+        group[i].exAequo = true;
+      }
+    }
+
+    start = end;
+  }
 }
 
 export function computeStandings(fixtureState) {
@@ -108,6 +136,8 @@ export function computeStandings(fixtureState) {
       if (!complete) {
         const minPos = Math.min(...group.map(x => x.pos));
         group.forEach(x => { x.pos = minPos; x.exAequo = true; });
+      } else {
+        markUnresolvedCardTies(group, h2h);
       }
     }
     seenPts.add(t.pts);
