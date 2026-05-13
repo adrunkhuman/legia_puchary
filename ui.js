@@ -238,8 +238,8 @@ function refreshPicker(fix) {
 }
 
 function updateSim() {
-  const { standings, tiedGroups, usedWins, usedAwayWins } = computeStandings(state);
-  renderStandings(standings, usedWins, usedAwayWins);
+  const { standings, tiedGroups, legiaInEurope, europeanLabels, usedWins, usedAwayWins } = computeStandings(state);
+  renderStandings(standings, europeanLabels, usedWins, usedAwayWins);
   renderH2HBlocks(tiedGroups);
 
   const keyPending = FIXTURES.filter(f => isKeyFixture(f)).filter(f => {
@@ -256,8 +256,6 @@ function updateSim() {
 
   badge.style.display = '';
   const legia = standings.find(t => t.id === 'LEG');
-  const europeanLabels = getEuropeanLabels(standings);
-  const legiaInEurope = europeanLabels.has('LEG') ? true : legia.exAequo ? null : false;
 
   if (legiaInEurope === true) {
     badge.textContent = `Legia w pucharach (${legia.pos}.)`;
@@ -271,7 +269,7 @@ function updateSim() {
   }
 }
 
-function renderStandings(sorted, usedWins, usedAwayWins) {
+function renderStandings(sorted, europeanLabels, usedWins, usedAwayWins) {
   const thead = document.querySelector('.standings thead tr');
   thead.innerHTML =
     `<th>#</th><th>Zespół</th><th>pkt</th><th>bilans</th><th>BZ</th><th>BS</th>` +
@@ -280,8 +278,6 @@ function renderStandings(sorted, usedWins, usedAwayWins) {
 
   const tbody = document.getElementById('standings-tbody');
   tbody.innerHTML = '';
-
-  const europeanLabels = getEuropeanLabels(sorted);
 
   for (const t of sorted) {
     const tr = document.createElement('tr');
@@ -314,34 +310,6 @@ function teamCellHtml(team) {
   if (!logoUrl) return `<span class="standings-team"><span class="standings-team-name">${team.name}</span></span>`;
 
   return `<span class="standings-team"><img class="standings-team-logo" src="${logoUrl}" alt="${team.name} logo" loading="lazy"><span class="standings-team-name">${team.name}</span></span>`;
-}
-
-function getEuropeanLabels(teams) {
-  const labels = new Map();
-
-  if (teams.some(team => team.exAequo && team.pos <= 6)) return labels;
-
-  for (const team of teams) {
-    if (!team.exAequo && team.pos <= 2) labels.set(team.id, 'LM');
-  }
-
-  const gornik = teams.find(team => team.id === 'GOR');
-  if (gornik && !gornik.exAequo && !labels.has(gornik.id)) {
-    labels.set(gornik.id, 'LE');
-  } else {
-    const leTeam = teams.find(team => !team.exAequo && !labels.has(team.id));
-    if (leTeam) labels.set(leTeam.id, 'LE');
-  }
-
-  let lkeCount = 0;
-  for (const team of teams) {
-    if (team.pos <= 2 || team.exAequo || labels.has(team.id) || team.id === 'RAD') continue;
-    labels.set(team.id, 'LKE');
-    lkeCount++;
-    if (lkeCount === 2) break;
-  }
-
-  return labels;
 }
 
 function renderH2HBlocks(tiedGroups) {

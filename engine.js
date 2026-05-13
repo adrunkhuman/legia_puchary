@@ -149,7 +149,7 @@ export function computeStandings(fixtureState) {
 
   sorted.forEach(t => { t.zone = europeanLabels.has(t.id) ? 'europe' : 'no-europe'; });
 
-  return { standings: sorted, tiedGroups, legiaInEurope, usedWins, usedAwayWins };
+  return { standings: sorted, tiedGroups, legiaInEurope, europeanLabels, usedWins, usedAwayWins };
 }
 
 function getEuropeanLabels(sorted) {
