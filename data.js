@@ -49,7 +49,7 @@ export const H2H = {
 };
 
 export const FIXTURES = [
-  { id:"m01", home:"ARK", away:"GOR", date:"13 May", round:"K31",  label:"Arka – Górnik",           tracked:["GOR"], homeIsTracked:false, awayIsTracked:true  },
+  { id:"m01", home:"ARK", away:"GOR", date:"13 May", round:"K31",  label:"Arka – Górnik",           tracked:["GOR"], homeIsTracked:false, awayIsTracked:true, finalScore:{ hg:0, ag:0 } },
   { id:"m02", home:"RAK", away:"JAG", date:"13 May", round:"K31",  label:"Raków – Jagiellonia",     tracked:["RAK","JAG"], homeIsTracked:true, awayIsTracked:true, isH2H:true },
 
   { id:"m03", home:"ZAG", away:"POG", date:"15 May", round:"R33",  label:"Zagłębie – Pogoń",        tracked:["ZAG"], homeIsTracked:true, awayIsTracked:false },

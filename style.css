@@ -313,6 +313,9 @@ html, body {
 
 .sbtn:hover { border-color: #555; color: var(--fg); }
 .sbtn.sbtn-active { border-color: var(--amber); color: var(--amber); background: #2a2010; }
+.sbtn:disabled { cursor: default; }
+.sbtn:disabled:hover { border-color: var(--dim); color: var(--muted); }
+.sbtn:disabled.sbtn-active:hover { border-color: var(--amber); color: var(--amber); }
 
 .score-dash {
   color: var(--dim);
@@ -332,6 +335,7 @@ html, body {
 }
 
 .score-clear:hover { color: var(--red); }
+.score-clear:disabled { cursor: default; color: #2f2f2f; }
 
 .conditions {
   max-width: 42rem;

@@ -55,9 +55,16 @@ function renderStaticVerdict() {
 }
 
 export function init() {
+  applyFinalScores();
   renderStaticVerdict();
   renderFixtures();
   updateSim();
+}
+
+function applyFinalScores() {
+  for (const fix of FIXTURES) {
+    if (fix.finalScore) state[fix.id] = { ...fix.finalScore };
+  }
 }
 
 function applyGoal(fixId, side, val) {
@@ -124,6 +131,7 @@ function getFixtureClass(fix) {
 function buildPicker(fix) {
   const wrap = document.createElement('div');
   wrap.className = 'score-picker';
+  const isFinal = Boolean(fix.finalScore);
 
   const [homeLabel, awayLabel] = fix.label.split(' – ');
 
@@ -149,7 +157,8 @@ function buildPicker(fix) {
     btn.dataset.fix = fix.id;
     btn.dataset.side = 'hg';
     btn.dataset.val = g;
-    btn.addEventListener('click', () => { applyGoal(fix.id, 'hg', g); refreshPicker(fix); updateSim(); });
+    btn.disabled = isFinal;
+    if (!isFinal) btn.addEventListener('click', () => { applyGoal(fix.id, 'hg', g); refreshPicker(fix); updateSim(); });
     homeSide.appendChild(btn);
   }
 
@@ -164,14 +173,16 @@ function buildPicker(fix) {
     btn.dataset.fix = fix.id;
     btn.dataset.side = 'ag';
     btn.dataset.val = g;
-    btn.addEventListener('click', () => { applyGoal(fix.id, 'ag', g); refreshPicker(fix); updateSim(); });
+    btn.disabled = isFinal;
+    if (!isFinal) btn.addEventListener('click', () => { applyGoal(fix.id, 'ag', g); refreshPicker(fix); updateSim(); });
     awaySide.appendChild(btn);
   }
 
   const clearBtn = document.createElement('button');
   clearBtn.className = 'score-clear';
   clearBtn.textContent = '✕';
-  clearBtn.addEventListener('click', () => { delete state[fix.id]; refreshPicker(fix); updateSim(); });
+  clearBtn.disabled = isFinal;
+  if (!isFinal) clearBtn.addEventListener('click', () => { delete state[fix.id]; refreshPicker(fix); updateSim(); });
 
   homeColumn.appendChild(homeName);
   homeColumn.appendChild(homeSide);
@@ -184,6 +195,7 @@ function buildPicker(fix) {
   wrap.appendChild(clearBtn);
 
   fix._picker = wrap;
+  refreshPicker(fix);
   return wrap;
 }
 

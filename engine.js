@@ -152,7 +152,9 @@ function getEuropeanLabels(sorted) {
 export function canLegiaMakeIt() {
   const bestState = {};
   for (const fix of FIXTURES) {
-    if (fix.tracked.includes('LEG')) {
+    if (fix.finalScore) {
+      bestState[fix.id] = { ...fix.finalScore };
+    } else if (fix.tracked.includes('LEG')) {
       bestState[fix.id] = fix.home === 'LEG' ? { hg: 1, ag: 0 } : { hg: 0, ag: 1 };
     } else if (fix.isH2H) {
       bestState[fix.id] = { hg: 0, ag: 0 };
