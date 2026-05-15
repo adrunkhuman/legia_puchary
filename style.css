@@ -360,6 +360,7 @@ html, body {
 
 .conditions-list li { min-width: 0; }
 .conditions-list .condition-done { color: var(--green); }
+.conditions-list .condition-done::marker { color: #9a9a9a; }
 
 .sim-verdict {
   font-size: 0.72rem;
