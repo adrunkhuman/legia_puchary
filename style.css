@@ -359,6 +359,7 @@ html, body {
 }
 
 .conditions-list li { min-width: 0; }
+.conditions-list .condition-done { color: var(--green); }
 
 .sim-verdict {
   font-size: 0.72rem;
