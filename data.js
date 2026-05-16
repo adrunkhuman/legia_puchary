@@ -54,7 +54,7 @@ export const FIXTURES = [
 
   { id:"m03", home:"ZAG", away:"POG", date:"15 May", round:"R33",  label:"Zagłębie – Pogoń",        tracked:["ZAG"], homeIsTracked:true, awayIsTracked:false, finalScore:{ hg:0, ag:1 } },
   { id:"m04", home:"WIS", away:"GOR", date:"16 May", round:"R33",  label:"Wisła – Górnik",          tracked:["WIS","GOR"], homeIsTracked:true, awayIsTracked:true, isH2H:true, finalScore:{ hg:0, ag:1 } },
-  { id:"m05", home:"RAD", away:"LEC", date:"16 May", round:"R33",  label:"Radomiak – Lech",         tracked:["RAD","LEC"], homeIsTracked:true, awayIsTracked:true, isH2H:true },
+  { id:"m05", home:"RAD", away:"LEC", date:"16 May", round:"R33",  label:"Radomiak – Lech",         tracked:["RAD","LEC"], homeIsTracked:true, awayIsTracked:true, isH2H:true, finalScore:{ hg:1, ag:3 } },
   { id:"m06", home:"PIR", away:"RAK", date:"17 May", round:"R33",  label:"Piast – Raków",           tracked:["RAK"], homeIsTracked:false, awayIsTracked:true  },
   { id:"m07", home:"GKS", away:"JAG", date:"17 May", round:"R33",  label:"GKS – Jagiellonia",       tracked:["GKS","JAG"], homeIsTracked:true, awayIsTracked:true, isH2H:true },
   { id:"m08", home:"LCH", away:"LEG", date:"17 May", round:"R33",  label:"Lechia – Legia",          tracked:["LEG"], homeIsTracked:false, awayIsTracked:true  },
