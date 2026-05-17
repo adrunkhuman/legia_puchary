@@ -57,7 +57,7 @@ export const FIXTURES = [
   { id:"m05", home:"RAD", away:"LEC", date:"16 May", round:"R33",  label:"Radomiak – Lech",         tracked:["RAD","LEC"], homeIsTracked:true, awayIsTracked:true, isH2H:true, finalScore:{ hg:1, ag:3 } },
   { id:"m06", home:"PIR", away:"RAK", date:"17 May", round:"R33",  label:"Piast – Raków",           tracked:["RAK"], homeIsTracked:false, awayIsTracked:true, finalScore:{ hg:1, ag:3 } },
   { id:"m07", home:"GKS", away:"JAG", date:"17 May", round:"R33",  label:"GKS – Jagiellonia",       tracked:["GKS","JAG"], homeIsTracked:true, awayIsTracked:true, isH2H:true, finalScore:{ hg:2, ag:2 } },
-  { id:"m08", home:"LCH", away:"LEG", date:"17 May", round:"R33",  label:"Lechia – Legia",          tracked:["LEG"], homeIsTracked:false, awayIsTracked:true  },
+  { id:"m08", home:"LCH", away:"LEG", date:"17 May", round:"R33",  label:"Lechia – Legia",          tracked:["LEG"], homeIsTracked:false, awayIsTracked:true, finalScore:{ hg:1, ag:2 } },
 
   { id:"m09", home:"LEG", away:"MOT", date:"23 May", round:"R34",  label:"Legia – Motor",           tracked:["LEG"], homeIsTracked:true, awayIsTracked:false },
   { id:"m10", home:"GOR", away:"RAD", date:"23 May", round:"R34",  label:"Górnik – Radomiak",       tracked:["GOR","RAD"], homeIsTracked:true, awayIsTracked:true, isH2H:true },
